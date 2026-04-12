@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./nyaya-frontend/public/logo.png" alt="Nyaya-AI Logo" width="150" />
+  <img src="https://github.com/aamit2267/NYAYA-AI/tree/master/nyaya-frontend/public/logo.png" alt="Nyaya-AI Logo" width="150" />
   
   # ⚖️ NYAYA-AI
   **Legal Guidance for Every Indian Citizen.**
