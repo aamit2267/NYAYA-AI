@@ -408,16 +408,6 @@ nyaya-ai/
 
 ```
 
-## 📚 Documentation
-
-| Document | Purpose |
-|----------|---------|
-| **[HLD.md](./docs/HLD.md)** | Architecture, components, data flows |
-| **[LLD.md](./docs/LLD.md)** | Code structure, APIs, class diagrams |
-| **[API.md](./docs/API.md)** | REST endpoint documentation (Swagger) |
-| **[TROUBLESHOOTING.md](./docs/TROUBLESHOOTING.md)** | Common issues & solutions |
-| **[DEPLOYMENT.md](./docs/DEPLOYMENT.md)** | Production deployment guide |
-
 ---
 
 ## 🚧 Current Status & Roadmap
