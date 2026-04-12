@@ -1,25 +1,28 @@
 package com.nyaya.backend.exception;
 
+import com.nyaya.backend.dto.ApiResponse;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.util.Map;
-
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> handleAllExceptions(Exception ex) {
-        System.err.println("Error occurred: " + ex.getMessage());
-        
+    public ResponseEntity<ApiResponse> handleAllExceptions(Exception ex, HttpServletResponse response) {
+        if (response.isCommitted())
+            return null;
+
+        log.error("INGESTION CRASHED: ", ex);
+
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of(
-                        "status", "error",
-                        "message", "An unexpected error occurred in Nyaya-AI.",
-                        "details", ex.getMessage() // Remove this in actual production for security
-                ));
+                .header("Content-Type", "application/json;charset=UTF-8")
+                .body(new ApiResponse("error", "Server Error", ex.getMessage()));
     }
 }

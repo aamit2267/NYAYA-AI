@@ -18,5 +18,11 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
+
+        registry.addMapping("/actuator/**")
+                .allowedOrigins(frontendUrl)
+                .allowedMethods("GET", "OPTIONS") // Health checks only need GET
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 }
