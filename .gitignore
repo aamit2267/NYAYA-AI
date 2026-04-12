@@ -1,0 +1,79 @@
+# ==========================================
+# Nyaya-AI Root Monorepo .gitignore
+# ==========================================
+
+# 🛑 CRITICAL SECURITY 🛑
+# Never commit your environment variables to version control!
+.env
+.env.*
+!.env.example
+!.env.local.example
+
+# ==========================================
+# Backend: Spring Boot & Maven (nyaya-backend/)
+# ==========================================
+nyaya-backend/target/
+nyaya-backend/!.mvn/wrapper/maven-wrapper.jar
+nyaya-backend/log/
+nyaya-backend/logs/
+nyaya-backend/**/*.log
+
+# Ignore compiled class files
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+
+# ==========================================
+# Frontend: Next.js & Node (nyaya-frontend/)
+# ==========================================
+# Node Modules
+nyaya-frontend/node_modules/
+nyaya-frontend/npm-debug.log*
+nyaya-frontend/yarn-debug.log*
+nyaya-frontend/yarn-error.log*
+
+# Next.js build output
+nyaya-frontend/.next/
+nyaya-frontend/out/
+nyaya-frontend/build/
+
+# Next.js cache and environment files
+nyaya-frontend/.vercel
+nyaya-frontend/*.tsbuildinfo
+nyaya-frontend/next-env.d.ts
+
+# ==========================================
+# IDEs and Editors
+# ==========================================
+# VS Code
+.vscode/
+*.code-workspace
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# ==========================================
+# OS Generated Files
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

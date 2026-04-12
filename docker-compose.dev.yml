@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  nyaya-db:
+    image: pgvector/pgvector:pg16
+    container_name: nyaya_postgres_dev
+    restart: unless-stopped
+    
+    env_file:
+      - .env
+      
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      
+    ports:
+      - "${HOST_DB_PORT}:5432"
+      
+    volumes:
+      - nyaya_pgdata:/var/lib/postgresql/data
+      
+      # [ACTION REQUIRED LATER]: When you are ready to automate database initialization 
+      # (e.g., automatically creating the vector extension or specific tables on startup), 
+      # you will write .sql scripts, put them in a folder, and uncomment the line below.
+      # - ./db-init-scripts:/docker-entrypoint-initdb.d
+      
+    # [ACTION REQUIRED]: Vector operations (especially creating HNSW indexes) 
+    # require significant shared memory. 1GB is a safe starting point. 
+    # If your Ubuntu laptop has 16GB+ RAM, you might want to increase this to "2g" or "4g" 
+    # later when you start ingesting thousands of legal documents.
+    shm_size: 1g 
+
+volumes:
+  nyaya_pgdata:
+    # Let Docker manage where this volume lives on your local disk
