@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.Map; // ADDED IMPORT
 
 @Slf4j
 @Service
@@ -47,7 +48,7 @@ public class ChatService {
         ContentRetriever contentRetriever = EmbeddingStoreContentRetriever.builder()
                 .embeddingStore(embeddingStore)
                 .embeddingModel(embeddingModel)
-                .maxResults(3)
+                .maxResults(3) 
                 .build();
 
         this.legalAssistant = AiServices.builder(LegalAssistant.class)
@@ -58,18 +59,18 @@ public class ChatService {
     }
 
     public SseEmitter streamAnswer(String question) {
-        SseEmitter emitter = new SseEmitter(120000L);
+        SseEmitter emitter = new SseEmitter(180_000L); 
         
         String guardrailInterception = guardrailService.checkAndIntercept(question);
         if (guardrailInterception != null) {
-            log.warn("Guardrail triggered for query. Short-circuiting to emergency response.");
+            log.warn("Guardrail triggered. Short-circuiting.");
             streamStaticString(emitter, guardrailInterception);
             return emitter;
         }
 
         String cachedResponse = cacheService.getCachedResponse(question);
         if (cachedResponse != null) {
-            log.info("Cache hit for query. Streaming cached response.");
+            log.info("Cache hit for query.");
             streamStaticString(emitter, cachedResponse);
             return emitter;
         }
@@ -81,15 +82,21 @@ public class ChatService {
         stream.onNext(token -> {
             try {
                 fullResponse.append(token);
-                emitter.send(token); 
+                emitter.send(SseEmitter.event().data(Map.of("text", token))); 
             } catch (IOException e) {
                 log.error("Error streaming token to client", e);
                 emitter.completeWithError(e);
             }
         })
         .onComplete(response -> {
-            cacheService.saveToCache(question, fullResponse.toString());
-            emitter.complete();
+            try {
+                emitter.send(SseEmitter.event().data(Map.of("text", "[DONE]")));
+                cacheService.saveToCache(question, fullResponse.toString());
+                emitter.complete();
+            } catch (IOException e) {
+                log.error("Failed to send completion signal", e);
+                emitter.completeWithError(e);
+            }
         })
         .onError(error -> {
             log.error("LLM Generation failed", error);
@@ -105,9 +112,10 @@ public class ChatService {
             try {
                 String[] words = text.split(" ");
                 for (String word : words) {
-                    emitter.send(word + " ");
-                    Thread.sleep(50);
+                    emitter.send(SseEmitter.event().data(Map.of("text", word + " ")));
+                    Thread.sleep(30);
                 }
+                emitter.send(SseEmitter.event().data(Map.of("text", "[DONE]")));
                 emitter.complete();
             } catch (Exception e) {
                 emitter.completeWithError(e);

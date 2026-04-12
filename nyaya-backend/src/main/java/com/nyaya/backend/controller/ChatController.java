@@ -2,7 +2,6 @@ package com.nyaya.backend.controller;
 
 import com.nyaya.backend.service.ChatService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -19,7 +18,7 @@ public class ChatController {
         this.chatService = chatService;
     }
 
-    @PostMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @PostMapping(produces = "text/event-stream;charset=UTF-8")
     public SseEmitter chat(@RequestBody Map<String, String> request) {
         String userQuestion = request.get("question");
         
