@@ -331,12 +331,10 @@ open http://localhost:3000
 
 #### Chat Query Endpoint
 ```bash
-curl -X POST http://localhost:8080/api/chat/query \
+curl -X POST http://localhost:8080/api/chat/ \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "What are my rights as an employee?",
-    "language": "en",
-    "sessionId": "user-uuid"
+    "question": "What are my rights as an employee?"
   }'
 
 # Response: Streams text via SSE
@@ -344,7 +342,7 @@ curl -X POST http://localhost:8080/api/chat/query \
 
 #### Document Upload Endpoint
 ```bash
-curl -X POST http://localhost:8080/api/admin/upload \
+curl -X POST http://localhost:8080/api/admin/ingest/pdf \
   -H "X-API-KEY: your_admin_api_key" \
   -F "file=@Legal_Document.pdf" \
   -F "metadata={\"source\": \"Supreme Court\"}"
@@ -360,18 +358,14 @@ curl -X POST http://localhost:8080/api/admin/upload \
 ✅ **Zero External API Calls**: All LLM processing happens locally via Ollama  
 ✅ **No Data Leakage**: User queries never sent to OpenAI/Anthropic/other third parties  
 ✅ **Encrypted Storage**: Sensitive fields encrypted at rest (future enhancement)  
-✅ **GDPR Ready**: Can delete user data and conversation history on request  
 
 ### API Security
 ✅ **API Key Authentication**: X-API-KEY header validation for admin endpoints  
 ✅ **CORS Protection**: Strict origin validation per environment  
 ✅ **Rate Limiting**: 10 requests/minute per IP for chat  
-✅ **Input Validation**: SQL injection & XSS prevention via parameterized queries  
 
 ### Application Security
 ✅ **Global Exception Handler**: Never exposes stack traces to clients  
-✅ **Prompt Injection Prevention**: Context validation before LLM  
-✅ **Audit Logging**: All admin actions logged with timestamps & IPs  
 ✅ **Secure Defaults**: HTTPS enforced, security headers included  
 
 ---
@@ -445,6 +439,14 @@ Contributions are welcome! Please follow these steps:
 - Add unit tests for new features
 - Update documentation for API changes
 - Test locally before submitting PR
+
+---
+
+## 🐳 Deployment
+I regret to inform you that, due to the backend’s requirement for a VM server with high CPU and GPU capacity, deploying Nyaya-AI is not feasible at this stage.
+
+I would appreciate any suggestions or recommendations for hosting the backend using free resources.
+
 
 ---
 
