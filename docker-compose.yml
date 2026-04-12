@@ -1,0 +1,125 @@
+version: '3.9'
+
+services:
+  nyaya-db:
+    image: pgvector/pgvector:pg16
+    container_name: nyaya_postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-nyaya_db}
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin_security@2026}
+    ports:
+      - "${HOST_DB_PORT:-5432}:5432"
+    volumes:
+      - nyaya_pgdata:/var/lib/postgresql/data
+    shm_size: 1g
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-nyaya_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - nyaya-network
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: nyaya_ollama
+    ports:
+      - "11434:11434"
+    environment:
+      OLLAMA_HOST: 0.0.0.0:11434
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - nyaya-network
+    restart: unless-stopped
+    # Uncomment the following line if you have GPU support
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  nyaya-backend:
+    build:
+      context: ./nyaya-backend
+      dockerfile: Dockerfile
+    container_name: nyaya_backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://nyaya-db:5432/${POSTGRES_DB:-nyaya_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-admin}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-admin_security@2026}
+      
+      SERVER_PORT: ${SERVER_PORT:-8080}
+      SPRING_PROFILES_ACTIVE: prod
+      
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_CHAT_MODEL: mistral
+      OLLAMA_EMBEDDING_MODEL: nomic-embed-text
+      
+      CORS_ALLOWED_ORIGINS: http://nyaya-frontend:3000
+      
+      JAVA_OPTS: "-XX:MaxRAMPercentage=75.0 -XX:+UseG1GC"
+    ports:
+      - "${SERVER_PORT:-8080}:${SERVER_PORT:-8080}"
+    depends_on:
+      nyaya-db:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    volumes:
+      - maven_cache:/root/.m2
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${SERVER_PORT:-8080}/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - nyaya-network
+    restart: unless-stopped
+
+  nyaya-frontend:
+    build:
+      context: ./nyaya-frontend
+      dockerfile: Dockerfile
+    container_name: nyaya_frontend
+    environment:
+      NODE_ENV: production
+
+      NEXT_PUBLIC_API_URL: http://nyaya-backend:${SERVER_PORT:-8080}
+    ports:
+      - "3000:3000"
+    depends_on:
+      nyaya-backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - nyaya-network
+    restart: unless-stopped
+
+networks:
+  nyaya-network:
+    driver: bridge
+
+volumes:
+  nyaya_pgdata:
+    driver: local
+  ollama_data:
+    driver: local
+  maven_cache:
+    driver: local
