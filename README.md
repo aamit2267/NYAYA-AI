@@ -33,8 +33,6 @@
 <summary>A glimpse of the future of legal knowledge in India</summary>
 <img src="assets/nyaya-home.png" alt="Nyaya AI Home Page" />
 <img src="assets/nyaya-home-hindi.png" alt="Nyaya AI Home Page [Hindi]" />
-<img src="assets/nyaya-home-dark.png" alt="Nyaya AI Home Page [Dark Mode]" />
-<img src="assets/nyaya-home-colourblind.png" alt="Nyaya AI Home Page [Colour Blind Mode]" />
 <img src="assets/nyaya-admin.png" alt="Nyaya AI Admin Ingest Page" />
 <img src="assets/nyaya-chat.png" alt="Nyaya Chat AI" />
 </details>
@@ -61,7 +59,7 @@ As a Full Stack Engineer with enterprise experience, **Nyaya-AI** demonstrates m
 
 **Backend Innovations**:
 * ✅ Local LLM orchestration (Ollama) eliminating data privacy risks
-* ✅ Vector database optimization (pgvector + HNSW indexing)
+* ✅ Vector database optimization (pgvector dense/semantic searching)
 * ✅ Production-grade RAG pipeline from document ingestion to streaming
 * ✅ Spring Boot microservices with async processing & caching
 
